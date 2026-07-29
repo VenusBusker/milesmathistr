@@ -1,0 +1,36 @@
+name: Miles Mathis Çeviri Botu
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # Her gece 03:00'te otomatik çalışır
+  workflow_dispatch: # Elle de başlatabilmemiz için
+
+permissions:
+  contents: write
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kodu Çek
+        uses: actions/checkout@v4
+
+      - name: Python Kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Bağımlılıkları Yükle
+        run: |
+          pip install -r requirements.txt
+
+      - name: Botu Çalıştır
+        run: python bot.py
+
+      - name: Değişiklikleri GitHub'a Kaydet
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/
+          git commit -m "Yeni çeviriler eklendi" || exit 0
+          git push
